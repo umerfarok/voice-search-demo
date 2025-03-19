@@ -8,7 +8,7 @@ This project demonstrates a voice search interface for an e-commerce product cat
 
 
 <!-- Option 2: Animated GIF from your video -->
-![Demo Animation](demo/demo-animation.gif)
+![Demo Animation](demo/demo-animation2.gif)
 *GIF showing basic voice search functionality*
 
 ## Installation
