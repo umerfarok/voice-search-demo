@@ -2,6 +2,15 @@
 
 This project demonstrates a voice search interface for an e-commerce product catalog, using speech-to-text and semantic search technology.
 
+## Demo
+
+### Video Demonstration
+
+
+<!-- Option 2: Animated GIF from your video -->
+![Demo Animation](demo/demo-animation.gif)
+*GIF showing basic voice search functionality*
+
 ## Installation
 
 ### Prerequisites
