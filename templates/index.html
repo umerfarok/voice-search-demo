@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Search E-Commerce Demo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Voice Search E-Commerce Demo</h1>
+            <p>Ask about products using your voice or search by typing</p>
+            {% if minimal_mode %}
+            <div id="statusBanner" class="status-banner">
+                <p>⚠️ Running in minimal mode with limited functionality.</p>
+                <p>Model download failed. Try running <code>python install_requirements.py</code> or check network permissions.</p>
+                <p><strong>Text search is still available</strong></p>
+            </div>
+            {% endif %}
+        </header>
+
+        <main>
+            <div class="search-section">
+                <div class="voice-search">
+                    <h2>Voice Search</h2>
+                    <div class="controls">
+                        <button id="recordButton" class="record-btn" {% if minimal_mode %}disabled title="Voice search requires additional packages"{% endif %}>
+                            <span class="icon">🎤</span>
+                            <span class="text">Start Recording</span>
+                        </button>
+                        <div id="recordingStatus" class="status">Not recording</div>
+                    </div>
+                </div>
+
+                <div class="text-search">
+                    <h2>Text Search</h2>
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" placeholder="Type product query here...">
+                        <button id="searchButton">Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div class="transcription-box">                <div class="transcription-box">
+                    <h3>Transcription</h3>
+                    <p id="transcription">Your spoken words will appear here...</p>ur spoken words will appear here...</p>
+                </div>
+
+                <div class="product-results">
+                    <h3>Matched Product</h3>
+                    <div id="productCard" class="product-card">
+                        <div class="product-details">
+                            <h4 id="productName">Product name will appear here</h4>here</h4>
+                            <p id="productSpecs">Specifications will appear here</p>
+                            <p>Color: <span id="productColor">-</span></p>>Color: <span id="productColor">-</span></p>
+                            <p>Size: <span id="productSize">-</span></p>oductSize">-</span></p>
+                            <p>Price: <span id="productPrice">-</span></p>
+                            <a id="productLink" href="#" target="_blank">View Product</a> id="productLink" href="#" target="_blank">View Product</a>
+                        </div>div>
+                        <div class="match-score">  <div class="match-score">
+                            <p>Match Score: <span id="similarityScore">-</span></p>          <p>Match Score: <span id="similarityScore">-</span></p>
+                        </div>         </div>
+                    </div>                    </div>
+                </div></div>
+            </div>
+        </main>
+
+        <footer>        <footer>
+            <p>Voice-powered E-Commerce Search Demo</p>
+        </footer> </footer>
+    </div>iv>
+
+
+
+
+
+</html></body>    <script src="{{ url_for('static', filename='js/script.js') }}"></script>    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

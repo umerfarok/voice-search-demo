@@ -1,0 +1,144 @@
+dependenices and packages to install 
+
+!pip install transformers soundfile pandas sounddevice numpy
+!pip install openai-whisper
+!pip install sentence-transformers pandas
+
+
+
+Main Script 
+
+# Install necessary packages (uncomment if needed in Colab)
+# !pip install openai-whisper sentence-transformers pandas
+
+import whisper
+import pandas as pd
+from sentence_transformers import SentenceTransformer, util
+
+# ---------------------------
+# 1. Load Models
+# ---------------------------
+print("Loading Whisper model for transcription...")
+whisper_model = whisper.load_model("base")
+
+print("Loading SentenceTransformer model for semantic matching...")
+embedder = SentenceTransformer('all-MiniLM-L6-v2')
+
+# ---------------------------
+# 2. Create a Demo Product Catalog with 50 Products
+# ---------------------------
+demo_products = [
+    # Clothing items (Products 1 - 25)
+    {"id": 1, "name": "White T-Shirt", "specifications": "100% cotton, comfortable fit", "color": "White", "size": "M", "price": "$15", "website": "https://example.com/product/1"},
+    {"id": 2, "name": "Black Hoodie", "specifications": "Fleece lined, warm", "color": "Black", "size": "L", "price": "$30", "website": "https://example.com/product/2"},
+    {"id": 3, "name": "Blue Jeans", "specifications": "Slim fit denim", "color": "Blue", "size": "32", "price": "$40", "website": "https://example.com/product/3"},
+    {"id": 4, "name": "White Polo Shirt", "specifications": "Piqué cotton, classic style", "color": "White", "size": "M", "price": "$25", "website": "https://example.com/product/4"},
+    {"id": 5, "name": "Red Dress", "specifications": "Elegant, floral design", "color": "Red", "size": "S", "price": "$45", "website": "https://example.com/product/5"},
+    {"id": 6, "name": "Green Jacket", "specifications": "Water-resistant, lightweight", "color": "Green", "size": "L", "price": "$60", "website": "https://example.com/product/6"},
+    {"id": 7, "name": "Grey Sweater", "specifications": "Wool blend, cozy", "color": "Grey", "size": "M", "price": "$35", "website": "https://example.com/product/7"},
+    {"id": 8, "name": "Blue Shorts", "specifications": "Casual fit, denim", "color": "Blue", "size": "M", "price": "$20", "website": "https://example.com/product/8"},
+    {"id": 9, "name": "Black Skirt", "specifications": "Knit fabric, A-line", "color": "Black", "size": "S", "price": "$28", "website": "https://example.com/product/9"},
+    {"id": 10, "name": "Pink Blouse", "specifications": "Silk, elegant", "color": "Pink", "size": "M", "price": "$32", "website": "https://example.com/product/10"},
+    {"id": 11, "name": "Brown Belt", "specifications": "Leather, adjustable", "color": "Brown", "size": "One Size", "price": "$18", "website": "https://example.com/product/11"},
+    {"id": 12, "name": "Navy Suit", "specifications": "Tailored fit, formal wear", "color": "Navy", "size": "L", "price": "$120", "website": "https://example.com/product/12"},
+    {"id": 13, "name": "White Sneakers", "specifications": "Casual, comfortable", "color": "White", "size": "9", "price": "$50", "website": "https://example.com/product/13"},
+    {"id": 14, "name": "Black Boots", "specifications": "Leather, durable", "color": "Black", "size": "10", "price": "$80", "website": "https://example.com/product/14"},
+    {"id": 15, "name": "Yellow Raincoat", "specifications": "Waterproof, hooded", "color": "Yellow", "size": "M", "price": "$55", "website": "https://example.com/product/15"},
+    {"id": 16, "name": "Purple Scarf", "specifications": "Soft, woolen", "color": "Purple", "size": "One Size", "price": "$22", "website": "https://example.com/product/16"},
+    {"id": 17, "name": "Orange Cap", "specifications": "Adjustable, sporty", "color": "Orange", "size": "One Size", "price": "$15", "website": "https://example.com/product/17"},
+    {"id": 18, "name": "Grey Joggers", "specifications": "Athletic wear, comfortable", "color": "Grey", "size": "L", "price": "$30", "website": "https://example.com/product/18"},
+    {"id": 19, "name": "Maroon Cardigan", "specifications": "Knit, long sleeve", "color": "Maroon", "size": "M", "price": "$35", "website": "https://example.com/product/19"},
+    {"id": 20, "name": "Black Leather Jacket", "specifications": "Biker style, genuine leather", "color": "Black", "size": "L", "price": "$150", "website": "https://example.com/product/20"},
+    {"id": 21, "name": "White Dress Shirt", "specifications": "Formal, cotton", "color": "White", "size": "M", "price": "$40", "website": "https://example.com/product/21"},
+    {"id": 22, "name": "Blue Capris", "specifications": "Summer style, lightweight", "color": "Blue", "size": "S", "price": "$28", "website": "https://example.com/product/22"},
+    {"id": 23, "name": "Red Sportswear", "specifications": "Moisture-wicking, active", "color": "Red", "size": "M", "price": "$35", "website": "https://example.com/product/23"},
+    {"id": 24, "name": "Green Tank Top", "specifications": "Casual, cotton", "color": "Green", "size": "L", "price": "$18", "website": "https://example.com/product/24"},
+    {"id": 25, "name": "Black Leggings", "specifications": "Stretchable, comfortable", "color": "Black", "size": "S", "price": "$20", "website": "https://example.com/product/25"},
+    
+    # Food items (Products 26 - 50)
+    {"id": 26, "name": "Organic Almonds", "specifications": "Raw, unsalted, 250g pack", "color": "N/A", "size": "250g", "price": "$10", "website": "https://example.com/product/26"},
+    {"id": 27, "name": "Greek Yogurt", "specifications": "Plain, low-fat, 500g", "color": "N/A", "size": "500g", "price": "$6", "website": "https://example.com/product/27"},
+    {"id": 28, "name": "Granola Bars", "specifications": "Mixed fruit, 12 pack", "color": "N/A", "size": "12 bars", "price": "$5", "website": "https://example.com/product/28"},
+    {"id": 29, "name": "Extra Virgin Olive Oil", "specifications": "Cold pressed, 500ml", "color": "N/A", "size": "500ml", "price": "$12", "website": "https://example.com/product/29"},
+    {"id": 30, "name": "Dark Chocolate", "specifications": "70% cocoa, 100g bar", "color": "N/A", "size": "100g", "price": "$4", "website": "https://example.com/product/30"},
+    {"id": 31, "name": "Strawberry Jam", "specifications": "Homemade, 300g jar", "color": "N/A", "size": "300g", "price": "$3", "website": "https://example.com/product/31"},
+    {"id": 32, "name": "Whole Wheat Bread", "specifications": "Freshly baked, 1 loaf", "color": "N/A", "size": "1 loaf", "price": "$2", "website": "https://example.com/product/32"},
+    {"id": 33, "name": "Organic Apples", "specifications": "Crisp, 1kg bag", "color": "Red/Green", "size": "1kg", "price": "$4", "website": "https://example.com/product/33"},
+    {"id": 34, "name": "Bananas", "specifications": "Fresh, 1 dozen", "color": "Yellow", "size": "12 pcs", "price": "$3", "website": "https://example.com/product/34"},
+    {"id": 35, "name": "Carrots", "specifications": "Organic, 1kg", "color": "Orange", "size": "1kg", "price": "$2", "website": "https://example.com/product/35"},
+    {"id": 36, "name": "Organic Milk", "specifications": "Full cream, 1 liter", "color": "N/A", "size": "1L", "price": "$3", "website": "https://example.com/product/36"},
+    {"id": 37, "name": "Quinoa", "specifications": "Organic, 500g pack", "color": "N/A", "size": "500g", "price": "$7", "website": "https://example.com/product/37"},
+    {"id": 38, "name": "Brown Rice", "specifications": "Long grain, 1kg pack", "color": "N/A", "size": "1kg", "price": "$5", "website": "https://example.com/product/38"},
+    {"id": 39, "name": "Chicken Breast", "specifications": "Boneless, skinless, 500g", "color": "N/A", "size": "500g", "price": "$8", "website": "https://example.com/product/39"},
+    {"id": 40, "name": "Salmon Fillet", "specifications": "Fresh, 400g", "color": "N/A", "size": "400g", "price": "$12", "website": "https://example.com/product/40"},
+    {"id": 41, "name": "Eggs", "specifications": "Free-range, 12 pack", "color": "N/A", "size": "12 pcs", "price": "$3", "website": "https://example.com/product/41"},
+    {"id": 42, "name": "Organic Spinach", "specifications": "Fresh, 250g pack", "color": "Green", "size": "250g", "price": "$2", "website": "https://example.com/product/42"},
+    {"id": 43, "name": "Broccoli", "specifications": "Fresh, 500g", "color": "Green", "size": "500g", "price": "$3", "website": "https://example.com/product/43"},
+    {"id": 44, "name": "Tomatoes", "specifications": "Organic, 1kg", "color": "Red", "size": "1kg", "price": "$3", "website": "https://example.com/product/44"},
+    {"id": 45, "name": "Avocado", "specifications": "Fresh, 2 pcs", "color": "Green", "size": "2 pcs", "price": "$4", "website": "https://example.com/product/45"},
+    {"id": 46, "name": "Peanut Butter", "specifications": "Natural, 500g jar", "color": "N/A", "size": "500g", "price": "$5", "website": "https://example.com/product/46"},
+    {"id": 47, "name": "Organic Honey", "specifications": "Raw, 250g jar", "color": "N/A", "size": "250g", "price": "$6", "website": "https://example.com/product/47"},
+    {"id": 48, "name": "Green Tea", "specifications": "Organic, 100 tea bags", "color": "N/A", "size": "100 bags", "price": "$4", "website": "https://example.com/product/48"},
+    {"id": 49, "name": "Oatmeal", "specifications": "Whole grain, 500g", "color": "N/A", "size": "500g", "price": "$3", "website": "https://example.com/product/49"},
+    {"id": 50, "name": "Protein Bar", "specifications": "Chocolate flavor, 10 pack", "color": "N/A", "size": "10 bars", "price": "$5", "website": "https://example.com/product/50"}
+]
+
+# Convert the demo product list to a DataFrame
+product_catalog = pd.DataFrame(demo_products)
+
+# Create a searchable text field by combining key fields (name, specifications, color, size)
+product_catalog["text"] = product_catalog["name"] + " " + product_catalog["specifications"] + " " + product_catalog["color"] + " " + product_catalog["size"]
+
+# ---------------------------
+# 3. Define Helper Functions for Transcription and Matching
+# ---------------------------
+def transcribe_audio(audio_path):
+    """
+    Transcribes the given audio file using Whisper.
+    """
+    result = whisper_model.transcribe(audio_path)
+    return result["text"]
+
+def compute_catalog_embeddings(catalog, embedder):
+    """
+    Computes embeddings for each product's text field.
+    """
+    texts = catalog["text"].tolist()
+    embeddings = embedder.encode(texts, convert_to_tensor=True)
+    return embeddings
+
+def find_best_match(query, catalog, product_embeddings, embedder):
+    """
+    Uses SentenceTransformer embeddings to find the best matching product.
+    Returns the best match row and the similarity score.
+    """
+    query_embedding = embedder.encode(query, convert_to_tensor=True)
+    cosine_scores = util.cos_sim(query_embedding, product_embeddings)
+    best_match_idx = int(cosine_scores.argmax())
+    best_match = catalog.iloc[best_match_idx]
+    score = cosine_scores[0][best_match_idx].item()
+    return best_match, score
+
+# ---------------------------
+# 4. Main Demo Workflow
+# ---------------------------
+print("Computing embeddings for product catalog...")
+product_embeddings = compute_catalog_embeddings(product_catalog, embedder)
+
+# Specify the path to your uploaded audio file (record your query such as "Do you have a white t-shirt in your store?")
+audio_path = "/content/Record (online-voice-recorder.com).mp3"  # Update as needed
+
+# Transcribe the voice query
+print("Transcribing audio query...")
+query_text = transcribe_audio(audio_path)
+print(f"Transcribed Query: {query_text}\n")
+
+# Find the best matching product
+best_match, score = find_best_match(query_text, product_catalog, product_embeddings, embedder)
+print("Matching Product:")
+print(best_match)
+print(f"\nSimilarity Score: {score:.2f}")
+
+# ---------------------------
+# Optional: Integrate a TTS response here to speak the result
+# ---------------------------

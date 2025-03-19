@@ -1,0 +1,56 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+ENV/
+venv310/
+
+# Flask specific
+instance/
+.webassets-cache
+
+# Environment variables
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# Project specific
+uploads/
+models/
+*.webm
+*.wav
+*.mp3
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Pytorch model files
+*.pth
+*.pt
+*.bin
+
+# Jupyter Notebook
+.ipynb_checkpoints
